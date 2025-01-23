@@ -6,7 +6,7 @@
 /*   By: ehedeman <ehedeman@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:05:46 by ehedeman          #+#    #+#             */
-/*   Updated: 2025/01/23 13:40:05 by ehedeman         ###   ########.fr       */
+/*   Updated: 2025/01/23 13:42:47 by ehedeman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ int main()
 	std::deque<int> _deque;
 	std::vector<int> _vector;
 	int index;
+
 	_deque.push_front(1);		//index 7 because push.front
 	_deque.push_front(0);		//index 6
 	_deque.push_front(9);		//index 5
