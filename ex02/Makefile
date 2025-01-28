@@ -6,11 +6,11 @@
 #    By: ehedeman <ehedeman@student.42wolfsburg.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/14 14:53:54 by ehedeman          #+#    #+#              #
-#    Updated: 2025/01/24 15:19:07 by ehedeman         ###   ########.fr        #
+#    Updated: 2025/01/28 13:14:14 by ehedeman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = span
+NAME = MutantStack
 
 SRC =	main.cpp	\
 
@@ -18,7 +18,7 @@ OBJS_DIR = objs/
 OBJS = $(SRC:.cpp=.o)
 OBJS_PREFIXED = $(addprefix $(OBJS_DIR), $(OBJS))
 
-INCLUDES =	MutantStack.hpp MutantStack.tpp
+INCLUDES =	MutantStack.hpp
 
 CXX = c++
 

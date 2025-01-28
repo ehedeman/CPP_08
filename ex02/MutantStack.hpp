@@ -6,56 +6,48 @@
 /*   By: ehedeman <ehedeman@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 15:19:38 by ehedeman          #+#    #+#             */
-/*   Updated: 2025/01/24 16:02:05 by ehedeman         ###   ########.fr       */
+/*   Updated: 2025/01/28 13:16:24 by ehedeman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #include <iostream>
 #include <iterator>
 #include <stack>
 
-template<typename T>class MutantStack : public std::stack
+template<class T>class MutantStack : public std::stack<T>
 {
 private:
 	/* data */
 public:
-				MutantStack(void);
-				MutantStack();
-				MutantStack(const MutantStack &copy);
-				~MutantStack();
-
-	typedef typename std::stack<T>::container_type::iterator iterator;
-	typedef typename std::stack<T>::container_type::const_iterator const_iterator;
-	typedef typename std::stack<T>::container_type::reverse_iterator reverse_iterator;
-	typedef typename std::stack<T>::container_type::const_reverse_iterator const_reverse_iterator;
-
-	iterator	find(iterator begin, iterator end, T value); //??
-
-	iterator	begin();
-	iterator	end();
+	typedef std::stack<T> stack;
+	typedef typename stack::container_type container;
+	typedef typename container::iterator iterator;
 	
-	const_iterator	begin()const;
-	const_iterator	end()const;
-	
-	reverse_iterator	begin();
-	reverse_iterator	end();
-	
-	const_reverse_iterator	begin()const;
-	const_reverse_iterator	end()const;
+	MutantStack(void)
+	{
+		std::cout <<	"Default constructor called."	<<std::endl;
+	}
+	MutantStack(const MutantStack &copy): stack(copy)
+	{
+		std::cout <<	"Copy constructor called."		<<std::endl;
+	}
+	~MutantStack()
+	{
+		std::cout <<	"Destructor called."			<<std::endl;
+	}
+	stack	&operator=(const MutantStack &copy)
+	{
+		if(*this != copy)
+			*this = copy;
+		return(*this);
+	}
+	iterator begin()
+	{
+		return (stack::c.begin());
+	}
+	iterator end()
+	{
+		return(stack::c.end());
+	}
 };
-
-template<typename T>MutantStack<T>::MutantStack(void)
-{
-}
-
-template<typename T>MutantStack<T>::MutantStack(void)
-{
-}
-
-template<typename T>MutantStack<T>::MutantStack(const MutantStack &copy)
-{
-}
-
-template<typename T>MutantStack<T>::~MutantStack(/* args */)
-{
-}
