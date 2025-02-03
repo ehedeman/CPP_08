@@ -6,90 +6,81 @@
 /*   By: ehedeman <ehedeman@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:44:05 by ehedeman          #+#    #+#             */
-/*   Updated: 2025/01/23 15:11:02 by ehedeman         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:37:07 by ehedeman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Span.hpp"
 
-Span::Span():size(10)
+Span::Span():_size(10)
 {
-	this->array = new int[size];
 	this->full = false;
 }
-Span::Span(unsigned int N):size(N)
+Span::Span(unsigned int N):_size(N)
 {
-	this->array = new int[size];
 	this->full = false;
 }
-Span::Span(const Span &copy):size(copy.getSize())
+Span::Span(const Span &copy):_size(copy.getSize())
 {
-	this->array = new int[size];
-	this->full = copy.getFull();
-	for (unsigned int i = 0; i < size; i++)
-		this->array[i] = copy.getNumber(i);
+	*this = copy;
 }
 Span::~Span()
 {
-	delete[](array);
 }
 
-
-unsigned int	Span::getSize()const{return (this->size);}
-int				Span::getNumber(int index)const{return (this->array[index]);}
-int				*Span::getArray()const{return (this->array);}
-bool			Span::getFull()const{return (this->full);}
-
-unsigned int	Span::getAmountNumbers()const
+Span	&Span::operator=(const Span &src)
 {
-	unsigned int count = 0;
-
-	for (unsigned int i = 0; i < this->size; i++)
+	if (this == &src)
+		return (*this);
+	
+	std::vector<int>::iterator it = src.getVector().begin();
+	this->_size = src.getSize();
+	this->full = src.getFull();
+	while (it != src.getVector().end())
 	{
-		if (this->array[i])
-			count++;
+		this->_vector.push_back(*it);
+		it++;
 	}
-	return (count);
+	return *this;
 }
+
+unsigned int	Span::getSize()const{return (this->_size);}
+int				Span::getNumber(unsigned int index)const
+{
+	if (index < _vector.size())
+		return (this->_vector[index]);
+	else
+		throw IndexTooLarge();
+}
+std::vector<int>Span::getVector()const{return (this->_vector);}
+bool			Span::getFull()const{return (this->full);}
 
 void			Span::addNumber(int number)
 {
-	int i = 0;
-
-	if (this->getAmountNumbers() != this->size)
-	{
-		while (this->array[i])
-			i++;
-		this->array[i] = number;
-	}
+	if (this->_vector.size() < this->_size)
+		this->_vector.push_back(number);
 	else
-		throw FullArrayException();
+		throw FullVectorException();
 }
 
 int				Span::maxInt(int a, int b)const{return (a >= b ? a : b);}
 int				Span::minInt(int a, int b)const{return (a <= b ? a : b);}
 
-void			Span::fillArray(int value, unsigned int amount)
+void			Span::fillVector(int value, unsigned int amount)
 {
-	if (amount > this->size)
+	if (amount > this->_size)
 		throw AmountLargerThanSize();
 	else
 	{
 		if (!value)
 		{
-			for (unsigned int i = 0; i < amount; i++)
-			{
-				if (!this->array[i])
-					this->array[i] = value++;
-			}
+			while (this->_vector.size() < amount)
+				_vector.push_back(value);
 		}
 		else
 		{
-			for (unsigned int i = 0; i < amount; i++)
-			{
-				if (!this->array[i])
-					this->array[i] = value;
-			}
+			while (this->_vector.size() < amount)
+				_vector.push_back(value);
 		}
 	}
 }
@@ -98,61 +89,76 @@ void			Span::fillArray(int value, unsigned int amount)
 //finds biggest distance e.g if 0, 2 and 6 are stored, returns 4 (6 - 2)
 int				Span::shortestSpan()
 {
+	std::vector<int>::iterator it_i = _vector.begin();
+	std::vector<int>::iterator it_j;
 	int	distance = longestSpan();
-
-	if (this->getAmountNumbers() >= 2)
+	
+	if (this->_vector.size() >= 2)
 	{
-		for (unsigned int i = 0; i < this->size; i++)
+		while (it_i != _vector.end())
 		{
-			for (unsigned int j = 0; j < this->size; j++)
+			it_j = _vector.begin();
+			while (it_j != _vector.end())
 			{
-				if (i != j && this->array[i] && this->array[j])
+				if (it_i != it_j)
 				{
-					if ((maxInt(this->array[j], this->array[i]) - minInt(this->array[j], this->array[i])) < distance)
-						distance = maxInt(this->array[j], this->array[i]) - minInt(this->array[j], this->array[i]);
+					if ((maxInt(*it_j, *it_i) - minInt(*it_j, *it_i)) < distance)
+						distance = maxInt(*it_j, *it_i) - minInt(*it_j, *it_i);
 				}
+				it_j++;
 			}
+			it_i++;
 		}
 	}
 	else
-		throw EmptyArrayException();
+		throw EmptyVectorException();
 	return (distance);
 }
 
 int				Span::longestSpan()
 {
+	std::vector<int>::iterator it_i = _vector.begin();
+	std::vector<int>::iterator it_j;
 	int	distance = 0;
 	
-	if (this->getAmountNumbers() >= 2)
+	if (this->_vector.size() >= 2)
 	{
-		for (unsigned int i = 0; i < this->size; i++)
+		while (it_i != _vector.end())
 		{
-			for (unsigned int j = 0; j < this->size; j++)
+			it_j = _vector.begin();
+			while (it_j != _vector.end())
 			{
-				if (this->array[i] && this->array[j])
+				if (it_i != it_j)
 				{
-					if ((maxInt(this->array[j], this->array[i]) - minInt(this->array[j], this->array[i])) > distance)
-						distance = maxInt(this->array[j], this->array[i]) - minInt(this->array[j], this->array[i]);
+					if ((maxInt(*it_j, *it_i) - minInt(*it_j, *it_i)) > distance)
+						distance = maxInt(*it_j, *it_i) - minInt(*it_j, *it_i);
 				}
+				it_j++;
 			}
+			it_i++;
 		}
 	}
 	else
-		throw EmptyArrayException();
+		throw EmptyVectorException();
 	return (distance);
 }
 
-const char* Span::EmptyArrayException::what() const throw()
+const char* Span::EmptyVectorException::what() const throw()
 {
 	return "Array does not have enough objects.";
 }
 
-const char* Span::FullArrayException::what() const throw()
+const char* Span::FullVectorException::what() const throw()
 {
 	return "Full Array.";
 }
 
 const char* Span::AmountLargerThanSize::what() const throw()
 {
-	return "Amount is larger than array size.";
+	return "Amount is larger than Array Size.";
+}
+
+const char* Span::IndexTooLarge::what() const throw()
+{
+	return "Amount is larger than Array Size.";
 }
