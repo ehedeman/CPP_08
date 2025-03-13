@@ -6,62 +6,57 @@
 /*   By: ehedeman <ehedeman@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:44:05 by ehedeman          #+#    #+#             */
-/*   Updated: 2025/01/23 15:11:02 by ehedeman         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:53:00 by ehedeman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Span.hpp"
 
+/*------------------------------De/-Constructors------------------------------*/
 Span::Span():size(10)
 {
-	this->array = new int[size];
-	this->full = false;
 }
 Span::Span(unsigned int N):size(N)
 {
-	this->array = new int[size];
-	this->full = false;
 }
 Span::Span(const Span &copy):size(copy.getSize())
 {
-	this->array = new int[size];
-	this->full = copy.getFull();
-	for (unsigned int i = 0; i < size; i++)
-		this->array[i] = copy.getNumber(i);
+	Span src = copy;
+	for (size_t i = 0; i < src.getArray().size(); i++)
+		this->array.push_back(src.getNumber(i));
 }
 Span::~Span()
 {
-	delete[](array);
 }
 
+/*----------------------------------Accessors---------------------------------*/
 
-unsigned int	Span::getSize()const{return (this->size);}
-int				Span::getNumber(int index)const{return (this->array[index]);}
-int				*Span::getArray()const{return (this->array);}
-bool			Span::getFull()const{return (this->full);}
+unsigned int		Span::getSize()const{return (this->size);}
+int					Span::getNumber(int index)
+{
+	if (index >= (int)array.size())
+		throw IndexLargerThanSize();
+	return (this->array[index]);
+}
+std::vector<int>	&Span::getArray(){return (this->array);}
 
-unsigned int	Span::getAmountNumbers()const
+unsigned int		Span::getAmountNumbers()
 {
 	unsigned int count = 0;
-
-	for (unsigned int i = 0; i < this->size; i++)
-	{
-		if (this->array[i])
-			count++;
+	std::vector<int>::iterator it = this->array.begin();
+	while (it != array.end())
+	{	
+		it++;
+		count++;
 	}
 	return (count);
 }
+/*------------------------------Member Functions------------------------------*/
 
 void			Span::addNumber(int number)
 {
-	int i = 0;
-
 	if (this->getAmountNumbers() != this->size)
-	{
-		while (this->array[i])
-			i++;
-		this->array[i] = number;
-	}
+		this->array.push_back(number);
 	else
 		throw FullArrayException();
 }
@@ -75,22 +70,14 @@ void			Span::fillArray(int value, unsigned int amount)
 		throw AmountLargerThanSize();
 	else
 	{
-		if (!value)
+		unsigned int i = this->getAmountNumbers();
+		while (i < amount && array.size() <= this->size)
 		{
-			for (unsigned int i = 0; i < amount; i++)
-			{
-				if (!this->array[i])
-					this->array[i] = value++;
-			}
+			array.push_back(0);
+			i++;	
 		}
-		else
-		{
-			for (unsigned int i = 0; i < amount; i++)
-			{
-				if (!this->array[i])
-					this->array[i] = value;
-			}
-		}
+		std::vector<int>::iterator it = array.begin() + amount;
+		std::fill(array.begin(), it, value);
 	}
 }
 
@@ -102,9 +89,9 @@ int				Span::shortestSpan()
 
 	if (this->getAmountNumbers() >= 2)
 	{
-		for (unsigned int i = 0; i < this->size; i++)
+		for (size_t i= 0; i < this->array.size(); i++)
 		{
-			for (unsigned int j = 0; j < this->size; j++)
+			for (size_t j = 0; j < this->array.size(); j++)
 			{
 				if (i != j && this->array[i] && this->array[j])
 				{
@@ -125,9 +112,9 @@ int				Span::longestSpan()
 	
 	if (this->getAmountNumbers() >= 2)
 	{
-		for (unsigned int i = 0; i < this->size; i++)
+		for (unsigned int i = 0; i < this->array.size(); i++)
 		{
-			for (unsigned int j = 0; j < this->size; j++)
+			for (unsigned int j = 0; j < this->array.size(); j++)
 			{
 				if (this->array[i] && this->array[j])
 				{
@@ -142,6 +129,8 @@ int				Span::longestSpan()
 	return (distance);
 }
 
+/*------------------------------Custom Exceptions-----------------------------*/
+
 const char* Span::EmptyArrayException::what() const throw()
 {
 	return "Array does not have enough objects.";
@@ -155,4 +144,9 @@ const char* Span::FullArrayException::what() const throw()
 const char* Span::AmountLargerThanSize::what() const throw()
 {
 	return "Amount is larger than array size.";
+}
+
+const char* Span::IndexLargerThanSize::what() const throw()
+{
+	return "No item stored at Index.";
 }
